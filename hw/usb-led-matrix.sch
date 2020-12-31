@@ -1361,36 +1361,34 @@ USB_DM
 Text Label 6300 4050 2    50   ~ 0
 USB_DP
 Wire Wire Line
-	5900 2850 6300 2850
+	5900 5450 6300 5450
 Wire Wire Line
-	5900 2950 6300 2950
+	5900 5550 6300 5550
 Wire Wire Line
-	5900 3050 6300 3050
+	5900 5650 6300 5650
 Wire Wire Line
-	5900 3150 6300 3150
+	5900 5750 6300 5750
 Wire Wire Line
-	5900 3250 6300 3250
+	5900 5850 6300 5850
 Wire Wire Line
-	5900 3350 6300 3350
+	5900 5950 6300 5950
 Wire Wire Line
-	5900 3450 6300 3450
-Wire Wire Line
-	5900 3550 6300 3550
-Text Label 6300 2850 2    50   ~ 0
+	5900 6050 6300 6050
+Text Label 6300 5350 2    50   ~ 0
 ROW1
-Text Label 6300 2950 2    50   ~ 0
+Text Label 6300 5450 2    50   ~ 0
 ROW2
-Text Label 6300 3050 2    50   ~ 0
+Text Label 6300 5550 2    50   ~ 0
 ROW3
-Text Label 6300 3150 2    50   ~ 0
+Text Label 6300 5650 2    50   ~ 0
 ROW4
-Text Label 6300 3250 2    50   ~ 0
+Text Label 6300 5750 2    50   ~ 0
 ROW5
-Text Label 6300 3350 2    50   ~ 0
+Text Label 6300 5850 2    50   ~ 0
 ROW6
-Text Label 6300 3450 2    50   ~ 0
+Text Label 6300 5950 2    50   ~ 0
 ROW7
-Text Label 6300 3550 2    50   ~ 0
+Text Label 6300 6050 2    50   ~ 0
 ROW8
 Wire Wire Line
 	8050 3650 7650 3650
@@ -1775,23 +1773,19 @@ Wire Wire Line
 $Comp
 L Device:R R9
 U 1 1 6036EDA7
-P 6750 5350
-F 0 "R9" V 6543 5350 50  0000 C CNN
-F 1 "R" V 6634 5350 50  0000 C CNN
-F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 6680 5350 50  0001 C CNN
-F 3 "~" H 6750 5350 50  0001 C CNN
-	1    6750 5350
+P 7100 5350
+F 0 "R9" V 6893 5350 50  0000 C CNN
+F 1 "R" V 6984 5350 50  0000 C CNN
+F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 7030 5350 50  0001 C CNN
+F 3 "~" H 7100 5350 50  0001 C CNN
+	1    7100 5350
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	5900 5350 6350 5350
-Text Label 6300 5350 2    50   ~ 0
-BOOT0
+	5900 3050 6300 3050
 Wire Wire Line
-	5900 5650 6300 5650
-Wire Wire Line
-	5900 5550 6300 5550
-Text Label 6300 5650 2    50   ~ 0
+	5900 3150 6300 3150
+Text Label 6300 3050 2    50   ~ 0
 TX
 $Comp
 L power:GND #PWR0108
@@ -1806,7 +1800,7 @@ F 3 "" H 2750 2600 50  0001 C CNN
 $EndComp
 Text Label 4800 900  2    50   ~ 0
 VBUS
-Text Label 6300 5550 2    50   ~ 0
+Text Label 6300 3150 2    50   ~ 0
 RX
 $Comp
 L Connector:Conn_ST_STDC14 J2
@@ -1861,16 +1855,16 @@ $EndComp
 $Comp
 L power:GND #PWR0109
 U 1 1 6068EE74
-P 6900 5450
-F 0 "#PWR0109" H 6900 5200 50  0001 C CNN
-F 1 "GND" H 6905 5277 50  0000 C CNN
-F 2 "" H 6900 5450 50  0001 C CNN
-F 3 "" H 6900 5450 50  0001 C CNN
-	1    6900 5450
+P 7250 5450
+F 0 "#PWR0109" H 7250 5200 50  0001 C CNN
+F 1 "GND" H 7255 5277 50  0000 C CNN
+F 2 "" H 7250 5450 50  0001 C CNN
+F 3 "" H 7250 5450 50  0001 C CNN
+	1    7250 5450
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6900 5350 6900 5450
+	7250 5350 7250 5450
 $Comp
 L Device:C C9
 U 1 1 6079C39C
@@ -1913,12 +1907,12 @@ Connection ~ 1200 7200
 $Comp
 L Connector:TestPoint TP2
 U 1 1 6086B887
-P 6350 5350
-F 0 "TP2" H 6292 5376 50  0000 R CNN
-F 1 "TestPoint" H 6292 5467 50  0000 R CNN
-F 2 "TestPoint:TestPoint_THTPad_D1.0mm_Drill0.5mm" H 6550 5350 50  0001 C CNN
-F 3 "~" H 6550 5350 50  0001 C CNN
-	1    6350 5350
+P 6700 5350
+F 0 "TP2" H 6642 5376 50  0000 R CNN
+F 1 "TestPoint" H 6642 5467 50  0000 R CNN
+F 2 "TestPoint:TestPoint_THTPad_D1.0mm_Drill0.5mm" H 6900 5350 50  0001 C CNN
+F 3 "~" H 6900 5350 50  0001 C CNN
+	1    6700 5350
 	-1   0    0    1   
 $EndComp
 $Comp
@@ -1949,7 +1943,6 @@ F 3 "" H 8850 1550 50  0001 C CNN
 $EndComp
 Text Label 9100 1250 3    50   ~ 0
 VDD
-Connection ~ 6350 5350
 $Comp
 L Connector:TestPoint TP3
 U 1 1 609251CB
@@ -2147,23 +2140,6 @@ Wire Wire Line
 	2750 6100 3050 6100
 Wire Wire Line
 	2750 6100 2750 5950
-Wire Wire Line
-	2450 4200 2850 4200
-Text Label 2850 4200 2    50   ~ 0
-COL4
-$Comp
-L Device:Net-Tie_2 NT1
-U 1 1 6014E81B
-P 2350 4200
-F 0 "NT1" H 2350 4381 50  0000 C CNN
-F 1 "Net-Tie_2" H 2350 4290 50  0000 C CNN
-F 2 "Resistor_SMD:R_0201_0603Metric" H 2350 4200 50  0001 C CNN
-F 3 "~" H 2350 4200 50  0001 C CNN
-	1    2350 4200
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	1750 4200 2250 4200
 $Comp
 L Device:R R12
 U 1 1 601D0460
@@ -2187,8 +2163,8 @@ F 3 "" H 2450 3100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6350 5350 6600 5350
-Text Notes 6150 5750 1    50   ~ 0
+	6700 5350 6950 5350
+Text Notes 6400 3250 1    50   ~ 0
 LPUART1
 Wire Wire Line
 	5900 3750 6300 3750
@@ -2349,4 +2325,10 @@ Wire Wire Line
 	9000 1500 9000 1850
 Wire Wire Line
 	9100 1250 9100 1850
+Wire Wire Line
+	5900 5350 6700 5350
+Connection ~ 6700 5350
+NoConn ~ 1750 4200
+NoConn ~ 1750 4300
+NoConn ~ 1750 4500
 $EndSCHEMATC
