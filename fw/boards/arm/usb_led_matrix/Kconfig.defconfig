@@ -1,0 +1,11 @@
+# STM32G474RE Nucleo board configuration
+
+# Copyright (c) 2019 STMicroelectronics.
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_USB_LED_MATRIX
+
+config BOARD
+	default "usb_led_matrix"
+
+endif # BOARD_USB_LED_MATRIX
