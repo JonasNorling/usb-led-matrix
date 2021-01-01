@@ -19,7 +19,7 @@
 	};
 
 	matrix {
-		compatible = "gpio-pins";
+		compatible = "gpio-leds";
 		buffer_en {
 			label = "buffer enable";
 			gpios = <&gpioa 0 GPIO_ACTIVE_LOW>;
