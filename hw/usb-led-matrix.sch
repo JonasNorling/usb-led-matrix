@@ -1335,7 +1335,7 @@ F 3 "~" H 8200 6100 50  0001 C CNN
 $EndComp
 Text Notes 7850 3350 0    50   ~ 0
 All lines driven at\nthe same time.\nMax 8 mA per line
-Text Notes 9050 950  0    50   ~ 0
+Text Notes 9700 1300 0    50   ~ 0
 One column sunk\nat a time\n74245 sinks 35 mA?\nNexperia 74LVT244A sinks 32-64 mA
 Text Notes 3000 6900 0    50   ~ 0
 STM32G473CET6\nhttps://se.farnell.com/stmicroelectronics/stm32g473cet6/mcu-32bit-170mhz/dp/3132388
@@ -1357,9 +1357,9 @@ Wire Wire Line
 Wire Wire Line
 	5900 4050 6300 4050
 Text Label 6300 3950 2    50   ~ 0
-USB_DM
+USB_D-
 Text Label 6300 4050 2    50   ~ 0
-USB_DP
+USB_D+
 Wire Wire Line
 	5900 5450 6300 5450
 Wire Wire Line
@@ -1565,9 +1565,9 @@ $EndComp
 Wire Wire Line
 	3600 5850 3750 5850
 Text Label 6200 1800 2    50   ~ 0
-USB_DM
+USB_D-
 Text Label 4750 1800 0    50   ~ 0
-USB_DP
+USB_D+
 Wire Wire Line
 	3350 1800 3450 1800
 $Comp
@@ -1930,18 +1930,7 @@ Wire Wire Line
 	6950 4350 6950 4050
 Text Label 6950 4050 3    50   ~ 0
 VDD
-$Comp
-L power:GND #PWR0111
-U 1 1 608B0F92
-P 8850 1550
-F 0 "#PWR0111" H 8850 1300 50  0001 C CNN
-F 1 "GND" H 8855 1377 50  0000 C CNN
-F 2 "" H 8850 1550 50  0001 C CNN
-F 3 "" H 8850 1550 50  0001 C CNN
-	1    8850 1550
-	1    0    0    -1  
-$EndComp
-Text Label 9100 1250 3    50   ~ 0
+Text Label 9100 800  0    50   ~ 0
 VDD
 $Comp
 L Connector:TestPoint TP3
@@ -2242,10 +2231,6 @@ Wire Wire Line
 	3550 1900 3550 2100
 Connection ~ 3450 1900
 Wire Wire Line
-	8850 1550 8850 1500
-Wire Wire Line
-	8850 1500 9000 1500
-Wire Wire Line
 	4800 1100 5450 1100
 Connection ~ 5450 1100
 $Comp
@@ -2287,9 +2272,9 @@ Wire Wire Line
 Wire Wire Line
 	5950 1600 5850 1600
 Text Label 4000 2050 0    50   ~ 0
-USB_DM_CON
+USBCON_D-
 Text Label 3950 2100 0    50   ~ 0
-USB_DP_CON
+USBCON_D+
 $Comp
 L Power_Protection:USBLC6-2SC6 U4
 U 1 1 60D01910
@@ -2322,13 +2307,35 @@ Wire Wire Line
 Text Label 2450 2800 1    50   ~ 0
 SHIELD
 Wire Wire Line
-	9000 1500 9000 1850
-Wire Wire Line
-	9100 1250 9100 1850
-Wire Wire Line
 	5900 5350 6700 5350
 Connection ~ 6700 5350
 NoConn ~ 1750 4200
 NoConn ~ 1750 4300
 NoConn ~ 1750 4500
+Text Label 9000 1250 3    50   ~ 0
+BUFFER_EN
+Text Label 6300 2850 2    50   ~ 0
+BUFFER_EN
+Wire Wire Line
+	5900 2850 6300 2850
+$Comp
+L Device:R R13
+U 1 1 61564A09
+P 9000 1100
+F 0 "R13" V 8793 1100 50  0000 C CNN
+F 1 "R" V 8884 1100 50  0000 C CNN
+F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 8930 1100 50  0001 C CNN
+F 3 "~" H 9000 1100 50  0001 C CNN
+	1    9000 1100
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	9000 1250 9000 1850
+Wire Wire Line
+	9100 800  9100 950 
+Wire Wire Line
+	9000 950  9100 950 
+Connection ~ 9100 950 
+Wire Wire Line
+	9100 950  9100 1850
 $EndSCHEMATC
