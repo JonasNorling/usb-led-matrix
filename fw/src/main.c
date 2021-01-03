@@ -14,17 +14,16 @@ static void status_cb(enum usb_dc_status_code status, const uint8_t *param)
     LOG_INF("USB status %d", status);
 }
 
-int main(int argc, const char *argv[])
+void main(void)
 {
-    LOG_INF("Starting thing");
-
     led_matrix_init();
 
 	const struct device *hid_dev = device_get_binding("HID_0");
 	if (!hid_dev) {
 		LOG_ERR("Cannot get USB HID Device");
-		k_panic();
+		return;
 	}
+    LOG_INF("Opened HID device");
 
 	usb_hid_register_device(hid_dev,
 				            hid_report_desc,
@@ -36,10 +35,8 @@ int main(int argc, const char *argv[])
 	int ret = usb_enable(status_cb);
 	if (ret) {
 		LOG_ERR("Failed to enable USB");
-		k_panic();
+		return;
 	}
 
     led_loop();
-
-    return 0;
 }
