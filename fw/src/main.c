@@ -14,6 +14,13 @@ static void status_cb(enum usb_dc_status_code status, const uint8_t *param)
     LOG_INF("USB status %d", status);
 }
 
+int set_report(const struct device *dev,
+			   struct usb_setup_packet *setup, int32_t *len,
+			   uint8_t **data)
+{
+    LOG_INF("%s %d", __func__, *len);
+}
+
 void main(void)
 {
     led_matrix_init();
@@ -25,10 +32,14 @@ void main(void)
 	}
     LOG_INF("Opened HID device");
 
+    static const struct hid_ops hid_ops = {
+        .set_report = set_report,
+    };
+
 	usb_hid_register_device(hid_dev,
 				            hid_report_desc,
                             sizeof(hid_report_desc),
-				            NULL);
+				            &hid_ops);
 
 	usb_hid_init(hid_dev);
 
@@ -37,6 +48,23 @@ void main(void)
 		LOG_ERR("Failed to enable USB");
 		return;
 	}
+
+    uint8_t report[4] = { 0x00 };
+    while (true) {
+        LOG_INF("Moving");
+        k_sleep(K_MSEC(10000));
+        report[1] = 1;
+		ret = hid_int_ep_write(hid_dev, report, sizeof(report), NULL);
+		if (ret) {
+			LOG_ERR("HID write error, %d", ret);
+		}
+        k_sleep(K_MSEC(100));
+        report[1] = 0;
+		ret = hid_int_ep_write(hid_dev, report, sizeof(report), NULL);
+		if (ret) {
+			LOG_ERR("HID write error, %d", ret);
+		}
+    }
 
     led_loop();
 }
