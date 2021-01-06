@@ -1836,7 +1836,7 @@ U 1 1 6064B132
 P 2750 5750
 F 0 "Y1" V 2704 5994 50  0000 L CNN
 F 1 "ABM8-24.000MHZ-B2-T" V 2795 5994 50  0000 L CNN
-F 2 "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm" H 2750 5750 50  0001 C CNN
+F 2 "jonas_Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm" H 2750 5750 50  0001 C CNN
 F 3 "~" H 2750 5750 50  0001 C CNN
 	1    2750 5750
 	-1   0    0    1   
@@ -2338,4 +2338,56 @@ Wire Wire Line
 Connection ~ 9100 950 
 Wire Wire Line
 	9100 950  9100 1850
+$Comp
+L Connector:TestPoint TP4
+U 1 1 5FF8A342
+P 6550 3250
+F 0 "TP4" H 6492 3276 50  0000 R CNN
+F 1 "TestPoint" H 6492 3367 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 6750 3250 50  0001 C CNN
+F 3 "~" H 6750 3250 50  0001 C CNN
+	1    6550 3250
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP6
+U 1 1 5FF8AC19
+P 6750 3350
+F 0 "TP6" H 6692 3376 50  0000 R CNN
+F 1 "TestPoint" H 6692 3467 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 6950 3350 50  0001 C CNN
+F 3 "~" H 6950 3350 50  0001 C CNN
+	1    6750 3350
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP5
+U 1 1 5FF8AFDB
+P 6550 3450
+F 0 "TP5" H 6492 3476 50  0000 R CNN
+F 1 "TestPoint" H 6492 3567 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 6750 3450 50  0001 C CNN
+F 3 "~" H 6750 3450 50  0001 C CNN
+	1    6550 3450
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP7
+U 1 1 5FF8B267
+P 6750 3550
+F 0 "TP7" H 6692 3576 50  0000 R CNN
+F 1 "TestPoint" H 6692 3667 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 6950 3550 50  0001 C CNN
+F 3 "~" H 6950 3550 50  0001 C CNN
+	1    6750 3550
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5900 3250 6550 3250
+Wire Wire Line
+	5900 3450 6550 3450
+Wire Wire Line
+	5900 3350 6750 3350
+Wire Wire Line
+	5900 3550 6750 3550
 $EndSCHEMATC
