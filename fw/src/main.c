@@ -10,5 +10,5 @@ void main(void)
 {
     led_matrix_init();
     usbdev_init();
-    led_loop();
+    led_matrix_loop();
 }

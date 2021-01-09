@@ -1,11 +1,11 @@
 #include <usb/usb_device.h>
 #include <usb/class/usb_hid.h>
-
 #include <logging/log.h>
 
-LOG_MODULE_REGISTER(usbdev);
+#include "usbdev.h"
+#include "led_matrix.h"
 
-#define LED_COUNT 64
+LOG_MODULE_REGISTER(usbdev);
 
 // Vendor defined HID report
 static const uint8_t hid_report_desc[] = {
@@ -47,6 +47,7 @@ int set_report(const struct device *dev,
 {
     LOG_INF("%s len=%d", __func__, *len);
     LOG_HEXDUMP_INF(*data, *len, "Data");
+    led_matrix_set(*data, *len);
     return 0;
 }
 
