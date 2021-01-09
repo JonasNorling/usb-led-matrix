@@ -9,4 +9,7 @@ project(usb-led-matrix)
 target_sources(app PRIVATE
     src/main.c
     src/led_matrix.c
-    src/led_matrix.h)
+    src/led_matrix.h
+    src/usbdev.c
+    src/usbdev.h
+)

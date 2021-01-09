@@ -2,6 +2,8 @@
 #include <drivers/gpio.h>
 #include <logging/log.h>
 
+#include "led_matrix.h"
+
 LOG_MODULE_REGISTER(led_matrix);
 
 #define GPIO_PIN(dt_node, flags) { DT_GPIO_LABEL(dt_node, gpios), \
@@ -45,6 +47,9 @@ static const struct pin_definition pin_definitions[] = {
 
 static struct pin pins[ARRAY_SIZE(pin_definitions)];
 
+static uint8_t led_data[LED_COUNT];
+
+
 void led_matrix_init(void)
 {
     LOG_INF("Setting up LED matrix");
@@ -64,7 +69,12 @@ void led_matrix_init(void)
     }
 }
 
-void led_loop(void)
+static bool get_led_state(int col, int row)
+{
+    return led_data[(row * 8) + (col % 8)];
+}
+
+void led_matrix_loop(void)
 {
     #if !DT_NODE_HAS_STATUS(DT_PATH(matrix, buffer_en), okay)
     while (true) {
@@ -74,12 +84,28 @@ void led_loop(void)
     return;
     #endif
 
+    for (int i = 0; i < LED_COUNT; i++) {
+        uint8_t col = 1 << (i % 8);
+        uint8_t row = 1 << (i / 8);
+        gpio_port_set_masked(pins[1].device, 0xffff, (row << 8) | col);
+        k_sleep(K_MSEC(50));
+    }
+
     while (true) {
-        for (int i = 0; i < 64; i++) {
-            uint8_t col = 1 << (i % 8);
-            uint8_t row = 1 << (i / 8);
+        for (int colno = 0; colno < 8; colno++) {
+            const uint8_t col = 1 << colno;
+            uint8_t row = 0;
+            for (int rowno = 0; rowno < 8; rowno++) {
+                row |= get_led_state(col, row) ? 1 << rowno : 0;
+            }
             gpio_port_set_masked(pins[1].device, 0xffff, (row << 8) | col);
-            k_sleep(K_MSEC(50));
+            k_sleep(K_MSEC(10));
+            gpio_port_set_masked(pins[1].device, 0xffff, 0);
         }
     }
+}
+
+void led_matrix_set(const uint8_t *data, size_t len)
+{
+    memcpy(led_data, data, MIN(len, sizeof(led_data)));
 }
