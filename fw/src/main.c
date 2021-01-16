@@ -34,5 +34,9 @@ void main(void)
 
     led_matrix_init();
     usbdev_init();
-    led_matrix_loop();
+    led_matrix_start();
+
+    while (true) {
+        k_sleep(K_FOREVER);
+    }
 }

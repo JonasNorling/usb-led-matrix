@@ -4,6 +4,7 @@ export ZEPHYR_SDK_INSTALL_DIR ?= $(HOME)/zephyr-sdk
 
 BUILD=build
 BUILD_NATIVE=build_native
+TARGET_BOARD ?= usb_led_matrix
 
 .PHONY: all clean FORCE flash
 
@@ -13,7 +14,7 @@ $(BUILD_NATIVE)/zephyr/zephyr.elf: FORCE
 	west build -b native_posix -d $(BUILD_NATIVE)
 
 $(BUILD)/zephyr/zephyr.elf: FORCE
-	west build -d $(BUILD) -b usb_led_matrix
+	west build -d $(BUILD) -b $(TARGET_BOARD)
 
 flash: $(BUILD)/zephyr/zephyr.elf
 	west flash -d $(BUILD) -r openocd
