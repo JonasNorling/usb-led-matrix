@@ -1,6 +1,6 @@
 export ZEPHYR_BASE ?= $(HOME)/src/zephyrproject/zephyr
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
-export ZEPHYR_SDK_INSTALL_DIR ?= $(HOME)/.local/opt/zephyr-sdk/0.11.1
+export ZEPHYR_SDK_INSTALL_DIR ?= $(HOME)/zephyr-sdk
 
 BUILD=build
 BUILD_NATIVE=build_native
@@ -16,7 +16,10 @@ $(BUILD)/zephyr/zephyr.elf: FORCE
 	west build -d $(BUILD) -b usb_led_matrix
 
 flash: $(BUILD)/zephyr/zephyr.elf
-	west flash -d $(BUILD)
+	west flash -d $(BUILD) -r openocd
+
+debug: $(BUILD)/zephyr/zephyr.elf
+	west debug -d $(BUILD) -r openocd
 
 clean:
 	rm -rf $(BUILD) $(BUILD_NATIVE)
