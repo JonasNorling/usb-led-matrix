@@ -55,6 +55,7 @@ void led_matrix_init(void)
     LOG_INF("Setting up LED matrix");
     for (int i = 0; i < ARRAY_SIZE(pin_definitions); i++) {
         pins[i].device = device_get_binding(pin_definitions[i].devname);
+        pins[i].pin = pin_definitions[i].pin;
         if (!pins[i].device) {
             LOG_ERR("No device");
             return;
