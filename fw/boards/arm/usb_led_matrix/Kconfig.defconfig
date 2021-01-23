@@ -8,4 +8,8 @@ if BOARD_USB_LED_MATRIX
 config BOARD
 	default "usb_led_matrix"
 
+config USE_STM32_LL_CRS
+	default y
+
+
 endif # BOARD_USB_LED_MATRIX
