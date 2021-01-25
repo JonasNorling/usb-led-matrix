@@ -90,8 +90,7 @@ static int64_t now_us(void)
 static void sleep_us(int64_t us)
 {
     if (us < 0) {
-        perror("Negative sleep");
-        exit(1);
+        return;
     }
     const struct timespec ts = {
         .tv_sec = us / 1000000000,
@@ -133,6 +132,7 @@ int main(int argc, const char *argv[])
         if (res < 0) {
             fprintf(stderr, "Write returned %d\n", res);
             perror("Failed to write report");
+            return 1;
         }
 
         target_time += UPDATE_TIME_US;
@@ -164,6 +164,7 @@ int main(int argc, const char *argv[])
         if (res < 0) {
             fprintf(stderr, "Write returned %d\n", res);
             perror("Failed to write report");
+            return 1;
         }
 
         target_time += UPDATE_TIME_US;
