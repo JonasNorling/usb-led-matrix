@@ -1,0 +1,6 @@
+ACTION!="add|change", GOTO="elemental_rules_end"
+SUBSYSTEM!="usb|tty|hidraw", GOTO="elemental_rules_end"
+
+ATTRS{product}=="*usb-led-matrix*", MODE="660", GROUP="plugdev"
+
+LABEL="elemental_rules_end"
