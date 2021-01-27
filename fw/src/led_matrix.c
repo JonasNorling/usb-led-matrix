@@ -60,9 +60,10 @@ static const struct pin_definition pin_definitions[] = {
 };
 
 static struct pin pins[ARRAY_SIZE(pin_definitions)];
-static volatile uint8_t led_data[LED_COUNT];
+static uint8_t led_data[LED_COUNT];
 
 
+#if DT_NODE_HAS_STATUS(DT_PATH(matrix, buffer_en), okay)
 static bool get_led_state(int col, int row)
 {
     return led_data[(row * 8) + (col % 8)];
@@ -72,18 +73,16 @@ static void timer_isr(const void *arg)
 {
     LL_TIM_ClearFlag_UPDATE(TIMER);
 
-//#if DT_NODE_HAS_STATUS(DT_PATH(matrix, buffer_en), okay)
     static uint8_t colno = 0;
     colno++;
     uint8_t col = 1 << (colno % 8);
     uint8_t row = 0;
-    //gpio_port_set_masked(pins[1].device, 0xffff, 0);
     for (int rowno = 0; rowno < 8; rowno++) {
         row |= get_led_state(colno, rowno) ? (1 << rowno) : 0;
     }
     gpio_port_set_masked(pins[1].device, 0xffff, (row << 8) | col);
-//#endif
 }
+#endif
 
 void led_matrix_init(void)
 {
@@ -120,11 +119,56 @@ void led_matrix_init(void)
 #endif
 }
 
+static void test_patterns()
+{
+    uint8_t data[LED_COUNT];
+
+    // All on
+    memset(data, 0xff, sizeof(data));
+    led_matrix_set(data, LED_COUNT);
+    k_sleep(K_MSEC(500));
+
+    // All off
+    memset(data, 0x00, sizeof(data));
+    led_matrix_set(data, LED_COUNT);
+    k_sleep(K_MSEC(250));
+
+    // Rows
+    for (int row = 0; row < 8; row++) {
+        memset(data, 0x00, sizeof(data));
+        for (int col = 0; col < 8; col++) {
+            data[(row * 8) + (col % 8)] = 1;
+        }
+        led_matrix_set(data, LED_COUNT);
+        k_sleep(K_MSEC(125));
+    }
+
+    // Columns
+    for (int col = 0; col < 8; col++) {
+        memset(data, 0x00, sizeof(data));
+        for (int row = 0; row < 8; row++) {
+            data[(row * 8) + (col % 8)] = 1;
+        }
+        led_matrix_set(data, LED_COUNT);
+        k_sleep(K_MSEC(125));
+    }
+
+    // All off
+    for (int col = 0; col < 8; col++) {
+        for (int row = 0; row < 8; row++) {
+            data[(row * 8) + (col % 8)] = ((row - col) == 0) || ((row + col) == 8) ;
+        }
+    }
+    led_matrix_set(data, LED_COUNT);
+}
+
 void led_matrix_start(void)
 {
 #if CONFIG_SOC_FAMILY_STM32
     LL_TIM_EnableCounter(TIMER);
 #endif
+
+    test_patterns();
 }
 
 void led_matrix_set(const uint8_t *data, size_t len)
