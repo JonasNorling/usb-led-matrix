@@ -19,6 +19,9 @@ $(BUILD)/zephyr/zephyr.elf: FORCE
 flash: $(BUILD)/zephyr/zephyr.elf
 	west flash -d $(BUILD) -r openocd
 
+dfu: $(BUILD)/zephyr/zephyr.elf
+	dfu-util -a 0 -D $(BUILD)/zephyr/zephyr.bin --dfuse-address 0x08000000
+
 debug: $(BUILD)/zephyr/zephyr.elf
 	west debug -d $(BUILD) -r openocd
 
