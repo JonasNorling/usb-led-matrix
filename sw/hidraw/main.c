@@ -11,7 +11,15 @@
 #include <assert.h>
 
 #define MAX_CPUS 32
-#define UPDATE_TIME_US 100000
+#define ROWS 8
+#define COLS 8
+#define SHOW_CPUS ROWS
+#define HZ 10
+#define PWM_STEPS 8
+#define UPDATE_TIME_US (1000000 / HZ)
+
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
 
 __attribute__((packed)) struct report {
     uint8_t report_no;
@@ -123,22 +131,31 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    target_time = now_us();
-    for (int i = 0; i < 64; i++) {
-        struct report report = {};
-        report.led_state[i] = 1;
+    /*
+     * Put up a static image
+     */
+    struct report report = { .led_state = {
+        0, 1, 1, 1, 1, 1, 1, 0,
+        1, 1, 1, 2, 2, 1, 1, 1,
+        1, 1, 3, 4, 4, 3, 1, 1,
+        1, 2, 4, 8, 8, 4, 2, 1,
+        1, 2, 4, 8, 8, 4, 2, 1,
+        1, 1, 3, 4, 4, 3, 1, 1,
+        1, 1, 1, 2, 2, 1, 1, 1,
+        0, 1, 1, 1, 1, 1, 1, 0,
+    }};
 
-        int res = write(usb_fd, &report, sizeof(report));
-        if (res < 0) {
-            fprintf(stderr, "Write returned %d\n", res);
-            perror("Failed to write report");
-            return 1;
-        }
-
-        target_time += UPDATE_TIME_US;
-        sleep_us(target_time - now_us());
+    int res = write(usb_fd, &report, sizeof(report));
+    if (res < 0) {
+        fprintf(stderr, "Write returned %d\n", res);
+        perror("Failed to write report");
+        return 1;
     }
+    sleep_us(900000);
 
+    /*
+     * Output CPU load
+     */
     struct stat_info stat_info = {};
     struct stat_info last_stat_info = {};
     get_stat(stat_fd, &last_stat_info);
@@ -146,17 +163,19 @@ int main(int argc, const char *argv[])
     target_time = now_us();
     while (true) {
         get_stat(stat_fd, &stat_info);
-        int jiffies[8] = {};
+        int jiffies[SHOW_CPUS] = {};
         for (int i = 0; i < stat_info.cpus; i++) {
-            jiffies[i % 8] += stat_info.cpu[i].jiffies - last_stat_info.cpu[i].jiffies;
+            jiffies[i % SHOW_CPUS] += stat_info.cpu[i].jiffies - last_stat_info.cpu[i].jiffies;
         }
         last_stat_info = stat_info;
 
         struct report report = {};
-        for (int row = 0; row < 8; row++) {
-            int leds = jiffies[row] * 8 / 20;
-            for (int col = 0; col < 8; col++) {
-                report.led_state[(row * 8) + col] = col < leds ? 1 : 0;
+        const int jiffies_per_tick = ((stat_info.cpus / SHOW_CPUS) * HZ);
+        for (int row = 0; row < ROWS; row++) {
+            const float led_count = (float)jiffies[row] * COLS / jiffies_per_tick;
+            for (int col = 0; col < COLS; col++) {
+                const float brightness = PWM_STEPS * (led_count - col);
+                report.led_state[(row * 8) + col] = MAX(MIN(brightness, 8), 0);
             }
         }
 
