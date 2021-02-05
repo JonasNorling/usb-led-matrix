@@ -63,8 +63,8 @@ static struct pin pins[ARRAY_SIZE(pin_definitions)];
 static uint8_t led_data[LED_COUNT];
 
 
-#if DT_NODE_HAS_STATUS(DT_PATH(matrix, buffer_en), okay)
-static bool get_led_state(int col, int row)
+#if CONFIG_SOC_FAMILY_STM32
+static uint8_t get_led_state(int col, int row)
 {
     return led_data[(row * 8) + (col % 8)];
 }
@@ -73,14 +73,21 @@ static void timer_isr(const void *arg)
 {
     LL_TIM_ClearFlag_UPDATE(TIMER);
 
-    static uint8_t colno = 0;
-    colno++;
-    uint8_t col = 1 << (colno % 8);
+    static uint8_t counter = 0;
+    counter++;
+
+    const uint8_t colno = counter % 8;
+    const uint8_t pwm = (counter / 8) % 16;
+
     uint8_t row = 0;
     for (int rowno = 0; rowno < 8; rowno++) {
-        row |= get_led_state(colno, rowno) ? (1 << rowno) : 0;
+        const uint8_t intensity = get_led_state(colno, rowno);
+        const bool on = intensity > pwm;
+        row |= on ? (1 << rowno) : 0;
     }
-    gpio_port_set_masked(pins[1].device, 0xffff, (row << 8) | col);
+
+    const uint8_t colbits = 1 << colno;
+    gpio_port_set_masked(pins[1].device, 0xffff, (row << 8) | colbits);
 }
 #endif
 
@@ -112,8 +119,8 @@ void led_matrix_init(void)
     __HAL_RCC_TIM1_CLK_ENABLE();
     LL_TIM_InitTypeDef init;
     LL_TIM_StructInit(&init);
-    //init.Prescaler = 2594;  // Makes 1 Hz interrupts
     init.Prescaler = 1;
+    init.Autoreload = 256;
     LL_TIM_Init(TIMER, &init);
     LL_TIM_EnableIT_UPDATE(TIMER);
 #endif
@@ -128,10 +135,12 @@ static void test_patterns()
     led_matrix_set(data, LED_COUNT);
     k_sleep(K_MSEC(500));
 
-    // All off
-    memset(data, 0x00, sizeof(data));
-    led_matrix_set(data, LED_COUNT);
-    k_sleep(K_MSEC(250));
+    // Fade out
+    for (int i = 8; i >= 0; i--) {
+        memset(data, i, sizeof(data));
+        led_matrix_set(data, LED_COUNT);
+        k_sleep(K_MSEC(100));
+    }
 
     // Rows
     for (int row = 0; row < 8; row++) {
@@ -153,10 +162,10 @@ static void test_patterns()
         k_sleep(K_MSEC(125));
     }
 
-    // All off
+    // A cross
     for (int col = 0; col < 8; col++) {
         for (int row = 0; row < 8; row++) {
-            data[(row * 8) + (col % 8)] = ((row - col) == 0) || ((row + col) == 8) ;
+            data[(row * 8) + (col % 8)] = ((row - col) == 0) || ((row + col) == 7) ;
         }
     }
     led_matrix_set(data, LED_COUNT);
