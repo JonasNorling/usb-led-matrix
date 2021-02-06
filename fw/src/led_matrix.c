@@ -4,6 +4,8 @@
 #include <irq.h>
 #include <soc.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 #include "led_matrix.h"
 
@@ -70,12 +72,12 @@ static struct pin pins[ARRAY_SIZE(pin_definitions)];
 static uint8_t led_data[LED_COUNT];
 static bool usb_active = false;
 
-#if CONFIG_SOC_FAMILY_STM32
 static uint8_t get_led_state(int col, int row)
 {
     return led_data[(row * 8) + (col % 8)];
 }
 
+#if CONFIG_SOC_FAMILY_STM32
 static void timer_isr(const void *arg)
 {
     gpio_pin_set(pins[PIN_TP4].device, pins[PIN_TP4].pin, true);
@@ -180,6 +182,19 @@ static void test_patterns()
     led_matrix_set(data, LED_COUNT);
 }
 
+static unsigned craprand(void)
+{
+    static unsigned v = 0;
+    v = (1103515245 * v + 12345);
+    return v;
+}
+
+static float absolute(float v)
+{
+    if (v < 0) return -v;
+    return v;
+}
+
 #define KSZ 5
 static float get(float frame[8][8], int x, int y)
 {
@@ -193,17 +208,18 @@ static float get(float frame[8][8], int x, int y)
 static void step_animation(void)
 {
     static float kernel[KSZ][KSZ] = {
-        {    0,    0,    0,     0,    0 },
-        {    0,    0,  0.1, -0.08,    0 },
-        {    0,  0.1,  0.8,   0.1,    0 },
-        {    0,    0,  0.1, -0.08,    0 },
-        {    0,    0,    0,     0,    0 },
+        {    0, 0.01,    0,  0.00, 0.00 },
+        {    0,-0.01,  0.1, -0.08,    0 },
+        {    0, 0.09,  0.8,   0.1, 0.01 },
+        {    0,-0.01,  0.1, -0.08,    0 },
+        {    0, 0.01,    0,  0.00, 0.00 },
     };
     static float frame[8][8] = {{ 0 },
                                 { 0 },
                                 { 0 },
-                                { 0, 0, 0, 0, 20.0 }};
+                                { 20.0, 0, 0, 0, 0 }};
     float next_frame[8][8];
+    const float fudge = 0.998;
 
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
@@ -213,7 +229,7 @@ static void step_animation(void)
                     v += get(frame, col + x - KSZ/2, row + y - KSZ/2) * kernel[x][y];
                 }
             }
-            next_frame[col][row] = v;
+            next_frame[col][row] = v * fudge;
         }
     }
 
@@ -221,20 +237,27 @@ static void step_animation(void)
     float total = 0;
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
-            buffer[(row * 8) + (col % 8)] = next_frame[col][row];
+            buffer[(row * 8) + (col % 8)] = absolute(next_frame[col][row]);
+            if (absolute(next_frame[col][row]) > 15) {
+                next_frame[col][row] = 5;
+            }
             frame[col][row] = next_frame[col][row];
-            total += (next_frame[col][row] > 0) ? next_frame[col][row] : 0;
+            total += absolute(next_frame[col][row]);
         }
     }
     led_matrix_set(buffer, sizeof(buffer));
-    if (total < 2.0f) {
-        frame[4][4] = 50.0;
+    if (total < 50.0f) {
+        int x = craprand() % 8;
+        int y = craprand() % 8;
+        frame[x][y] = 20.0;
+        printf("Spawn at %d %d\n", x ,y);
     }
 #if CONFIG_BOARD_NATIVE_POSIX
+    printf("total=%.3f\n", total);
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
             const char c[9] = { ' ', '1', '2', '3', '4', '5', '6', '7', '@' };
-            int v = frame[row][col];
+            int v = get_led_state(row, col);
             if (v < 0) v = 0;
             if (v > 8) v = 8;
             printf("%c ", c[v]);

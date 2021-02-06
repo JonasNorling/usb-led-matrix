@@ -13,3 +13,5 @@ target_sources(app PRIVATE
     src/usbdev.c
     src/usbdev.h
 )
+
+target_link_libraries(app PUBLIC -lm)
