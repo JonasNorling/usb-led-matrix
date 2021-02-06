@@ -45,8 +45,6 @@ int set_report(const struct device *dev,
                struct usb_setup_packet *setup, int32_t *len,
                uint8_t **data)
 {
-    LOG_INF("%s len=%d", __func__, *len);
-    LOG_HEXDUMP_INF(*data, *len, "Data");
     led_matrix_set(*data, *len);
     return 0;
 }
