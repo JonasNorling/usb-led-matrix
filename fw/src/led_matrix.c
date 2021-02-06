@@ -30,6 +30,8 @@ struct pin {
     gpio_pin_t pin;
 };
 
+#define PIN_TP4 17
+
 static const struct pin_definition pin_definitions[] = {
 #if DT_NODE_HAS_STATUS(DT_PATH(matrix, buffer_en), okay)
     GPIO_PIN(DT_PATH(matrix, buffer_en), GPIO_OUTPUT_ACTIVE),
@@ -49,6 +51,10 @@ static const struct pin_definition pin_definitions[] = {
     GPIO_PIN(DT_PATH(matrix, col6), GPIO_OUTPUT_INACTIVE),
     GPIO_PIN(DT_PATH(matrix, col7), GPIO_OUTPUT_INACTIVE),
     GPIO_PIN(DT_PATH(matrix, col8), GPIO_OUTPUT_INACTIVE),
+    [PIN_TP4] = GPIO_PIN(DT_PATH(testpoints, tp4), GPIO_OUTPUT_INACTIVE),
+    GPIO_PIN(DT_PATH(testpoints, tp5), GPIO_INPUT),
+    GPIO_PIN(DT_PATH(testpoints, tp6), GPIO_INPUT),
+    GPIO_PIN(DT_PATH(testpoints, tp7), GPIO_INPUT),
 #elif DT_NODE_HAS_STATUS(DT_ALIAS(led0), okay)
     GPIO_PIN(DT_ALIAS(led0), GPIO_OUTPUT_INACTIVE),
     GPIO_PIN(DT_ALIAS(led1), GPIO_OUTPUT_INACTIVE),
@@ -71,6 +77,7 @@ static uint8_t get_led_state(int col, int row)
 
 static void timer_isr(const void *arg)
 {
+    gpio_pin_set(pins[PIN_TP4].device, pins[PIN_TP4].pin, true);
     LL_TIM_ClearFlag_UPDATE(TIMER);
 
     static uint8_t counter = 0;
@@ -88,6 +95,7 @@ static void timer_isr(const void *arg)
 
     const uint8_t colbits = 1 << colno;
     gpio_port_set_masked(pins[1].device, 0xffff, (row << 8) | colbits);
+    gpio_pin_set(pins[PIN_TP4].device, pins[PIN_TP4].pin, false);
 }
 #endif
 

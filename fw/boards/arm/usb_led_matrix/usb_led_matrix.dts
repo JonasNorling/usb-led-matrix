@@ -89,6 +89,26 @@
 			gpios = <&gpiob 15 GPIO_ACTIVE_HIGH>;
 		};
 	};
+	
+	testpoints {
+		compatible = "gpio-leds";
+		tp4 {
+			label = "tp4";
+			gpios = <&gpioa 4 GPIO_ACTIVE_LOW>;
+		};
+		tp5 {
+			label = "tp5";
+			gpios = <&gpioa 5 GPIO_ACTIVE_LOW>;
+		};
+		tp6 {
+			label = "tp6";
+			gpios = <&gpioa 6 GPIO_ACTIVE_LOW>;
+		};
+		tp7 {
+			label = "tp7";
+			gpios = <&gpioa 7 GPIO_ACTIVE_LOW>;
+		};
+	};
 };
 
 &lpuart1 {
