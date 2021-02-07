@@ -182,11 +182,11 @@ static void test_patterns()
     led_matrix_set(data, LED_COUNT);
 }
 
-static unsigned craprand(void)
+static uint8_t craprand(void)
 {
-    static unsigned v = 0;
+    static unsigned v = 1;
     v = (1103515245 * v + 12345);
-    return v;
+    return v >> 24;
 }
 
 static float absolute(float v)
@@ -246,11 +246,11 @@ static void step_animation(void)
         }
     }
     led_matrix_set(buffer, sizeof(buffer));
-    if (total < 50.0f) {
+    if (total < 70.0f) {
         int x = craprand() % 8;
         int y = craprand() % 8;
         frame[x][y] = 20.0;
-        printf("Spawn at %d %d\n", x ,y);
+        LOG_INF("Spawn at %d %d", x ,y);
     }
 #if CONFIG_BOARD_NATIVE_POSIX
     printf("total=%.3f\n", total);
