@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stm32_ll_tim.h>
 
 #include "led_matrix.h"
 

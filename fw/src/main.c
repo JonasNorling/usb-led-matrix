@@ -67,9 +67,9 @@ static void configure_bor()
 void main(void)
 {
 #if CONFIG_SOC_STM32G474XX
-    LL_DBGMCU_EnableDBGSleepMode();
-    LL_DBGMCU_EnableDBGStopMode();
-    LL_DBGMCU_EnableDBGStandbyMode();
+    HAL_DBGMCU_EnableDBGSleepMode();
+    HAL_DBGMCU_EnableDBGStopMode();
+    HAL_DBGMCU_EnableDBGStandbyMode();
 #endif
 
     led_matrix_init();
