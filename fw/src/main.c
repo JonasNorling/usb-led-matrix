@@ -29,6 +29,41 @@ static void enable_crs()
 #endif
 }
 
+/*
+ * Configure brown-out reset at a reasonable voltage level
+ */
+static void configure_bor()
+{
+#if CONFIG_SOC_STM32G474XX
+    FLASH_OBProgramInitTypeDef ob = {};
+    HAL_FLASHEx_OBGetConfig(&ob);
+
+    if ((ob.USERConfig & FLASH_OPTR_BOR_LEV_Msk) != FLASH_OPTR_BOR_LEV_3) {
+        LOG_INF("User option bytes: %08x", ob.USERConfig);
+        static const FLASH_OBProgramInitTypeDef ob_write = {
+            .OptionType = OPTIONBYTE_USER,
+            .USERType = OB_USER_BOR_LEV,
+            .USERConfig = OB_BOR_LEVEL_3,
+        };
+        if (HAL_FLASH_Unlock() != HAL_OK) {
+            LOG_ERR("Failed to unlock flash");
+        }
+        if (HAL_FLASH_OB_Unlock() != HAL_OK) {
+            LOG_ERR("Failed to unlock OB");
+        }
+        if (HAL_FLASHEx_OBProgram((FLASH_OBProgramInitTypeDef*)&ob_write) != HAL_OK) {
+            LOG_ERR("Failed to program option bytes");
+        }
+        if (HAL_FLASH_OB_Lock() != HAL_OK) {
+            LOG_ERR("Failed to lock OB");
+        }
+        if (HAL_FLASH_Lock() != HAL_OK) {
+            LOG_ERR("Failed to lock flash");
+        }
+    }
+#endif
+}
+
 void main(void)
 {
 #if CONFIG_SOC_STM32G474XX
@@ -37,9 +72,9 @@ void main(void)
     LL_DBGMCU_EnableDBGStandbyMode();
 #endif
 
-    enable_crs();
-
     led_matrix_init();
+    enable_crs();
+    configure_bor();
     usbdev_init();
     led_matrix_start();
 

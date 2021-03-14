@@ -6,3 +6,6 @@
 config BOARD_USB_LED_MATRIX
 	bool "USB LED matrix board"
 	depends on SOC_STM32G474XX
+
+select USE_STM32_HAL_FLASH
+select USE_STM32_HAL_FLASH_EX
