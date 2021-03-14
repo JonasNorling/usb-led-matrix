@@ -70,7 +70,7 @@ static const struct pin_definition pin_definitions[] = {
 
 static struct pin pins[ARRAY_SIZE(pin_definitions)];
 static uint8_t led_data[LED_COUNT];
-static bool usb_active = false;
+static uint64_t last_usb_active;
 
 static uint8_t get_led_state(int col, int row)
 {
@@ -245,7 +245,9 @@ static void step_animation(void)
             total += absolute(next_frame[col][row]);
         }
     }
-    led_matrix_set(buffer, sizeof(buffer));
+
+    memcpy(led_data, buffer, sizeof(led_data));
+
     if (total < 70.0f) {
         int x = craprand() % 8;
         int y = craprand() % 8;
@@ -276,7 +278,7 @@ void led_matrix_start(void)
 
     test_patterns();
     while (true) {
-        if (!usb_active) {
+        if (k_uptime_get() > last_usb_active + 2000) {
             step_animation();
         }
         k_sleep(K_MSEC(20));
@@ -286,5 +288,5 @@ void led_matrix_start(void)
 void led_matrix_set(const uint8_t *data, size_t len)
 {
     memcpy(led_data, data, MIN(len, sizeof(led_data)));
-    //usb_active = true;
+    last_usb_active = k_uptime_get();
 }
