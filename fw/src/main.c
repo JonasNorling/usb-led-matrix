@@ -4,8 +4,15 @@
 #include "led_matrix.h"
 #include "usbdev.h"
 
+#if CONFIG_SOC_STM32G474XX
+#include <stm32g4xx_ll_crs.h>
+#endif
+
 LOG_MODULE_REGISTER(main);
 
+/*
+ * Enable clock recovery to make USB work with internal oscillator
+ */
 static void enable_crs()
 {
 #if CONFIG_CLOCK_STM32_PLL_SRC_HSI
