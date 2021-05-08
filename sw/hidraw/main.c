@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <dirent.h>
 
 #define MAX_CPUS 32
 #define ROWS 8
@@ -37,7 +38,7 @@ struct stat_info {
 static void print_help(const char *progname)
 {
     printf(
-        "Usage: %s <hidraw device>\n",
+        "Usage: %s [<hidraw device>]\n",
         progname);
 }
 
@@ -72,7 +73,6 @@ static int open_device(const char *node)
 {
     int fd = open(node, O_WRONLY);
     if (fd < 0) {
-        perror("Unable to open hidraw device");
         return fd;
     }
 
@@ -82,8 +82,13 @@ static int open_device(const char *node)
         perror("ioctl failed");
         return res;
     }
-    
-    printf("Opened hidraw device for %s\n", name);
+
+    printf("Opened hidraw device %s: %s\n", node, name);
+
+    if (strcmp(name, "Elemental Instruments usb-led-matrix")) {
+        close(fd);
+        fd = -1;
+    }
 
     return fd;
 }
@@ -110,17 +115,54 @@ static void sleep_us(int64_t us)
     }
 }
 
+static int hid_name_filter(const struct dirent *dirent)
+{
+    return !strncmp("hidraw", dirent->d_name, 6);
+}
+
 int main(int argc, const char *argv[])
 {
     int64_t target_time;
+    int usb_fd = -1;
+    const char *device_name = NULL;
 
-    if (argc != 2) {
+    if (argc > 2) {
         print_help(argv[0]);
         return 1;
     }
-    const char *device_name = argv[1];
+    if (argc > 1) {
+        device_name = argv[1];
+    }
 
-    int usb_fd = open_device(device_name);
+    if (device_name) {
+        usb_fd = open_device(device_name);
+        if (usb_fd < 0) {
+            perror("Unable to open hidraw device");
+            return 1;
+        }
+    }
+    else {
+        // Try to find the right device
+        struct dirent **namelist = NULL;
+        int count = scandir("/dev", &namelist, hid_name_filter, versionsort);
+        if (count < 0) {
+            perror("Scandir failed");
+            return 1;
+        }
+
+        for (int i = 0; i < count; i++) {
+            char full_name[PATH_MAX];
+            snprintf(full_name, PATH_MAX, "/dev/%s", namelist[i]->d_name);
+            int fd = open_device(full_name);
+            free(namelist[i]);
+            if (fd >= 0) {
+                usb_fd = fd;
+                break;
+            }
+        }
+        free(namelist);
+    }
+
     if (usb_fd < 0) {
         return 1;
     }

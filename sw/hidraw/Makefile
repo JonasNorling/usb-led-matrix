@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Werror -O2
+CFLAGS=-Wall -Werror -O2 -D_GNU_SOURCE
 
 usb-led-matrix-hidraw: main.o
 	$(CC) -o $@ $<
