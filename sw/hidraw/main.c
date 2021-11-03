@@ -1,3 +1,8 @@
+/*
+ * User-space driver for the USB-LED-matrix,
+ * showing CPU load.
+ */
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -22,6 +27,7 @@
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 
+// USB HID report
 __attribute__((packed)) struct report {
     uint8_t report_no;
     uint8_t led_state[64];
@@ -54,12 +60,18 @@ static void get_stat(int fd, struct stat_info *stat_info)
     }
 
     const char *pt = buf;
+
+    // Skip first line (cpu)
     pt = strchr(pt, '\n');
     if (pt) pt++;
+
+    // Parse individual cpu lines
     while (pt) {
         int cpu, user, nice, system, idle, iowait;
-        res = sscanf(pt, "cpu%d %d %d %d %d %d", &cpu, &user, &nice, &system, &idle, &iowait);
-        if (res != 6) {
+        res = sscanf(pt, "cpu%d %d %d %d %d %d",
+                     &cpu, &user, &nice, &system, &idle, &iowait);
+        if (res != 6 || cpu >= MAX_CPUS) {
+            // We've gone past the cpu<n> lines
             break;
         }
         stat_info->cpu[cpu].jiffies = user + nice + system + iowait;
@@ -120,6 +132,60 @@ static int hid_name_filter(const struct dirent *dirent)
     return !strncmp("hidraw", dirent->d_name, 6);
 }
 
+static int find_device(void)
+{
+    int usb_fd = -1;
+    struct dirent **namelist = NULL;
+
+    int count = scandir("/dev", &namelist, hid_name_filter, versionsort);
+    if (count < 0) {
+        perror("Scandir failed");
+        return -1;
+    }
+
+    for (int i = 0; i < count; i++) {
+        char full_name[PATH_MAX];
+        snprintf(full_name, PATH_MAX, "/dev/%s", namelist[i]->d_name);
+        int fd = open_device(full_name);
+        free(namelist[i]);
+        if (fd >= 0) {
+            usb_fd = fd;
+            break;
+        }
+    }
+
+    free(namelist);
+    return usb_fd;
+}
+
+static int find_and_open_device(const char *device_name)
+{
+    int usb_fd = -1;
+
+    if (device_name) {
+        usb_fd = open_device(device_name);
+        if (usb_fd < 0) {
+            perror("Unable to open hidraw device");
+            return 1;
+        }
+    }
+    else {
+        // Try to find the right device
+        for (int i = 0; ; i++) {
+            usb_fd = find_device();
+            if (usb_fd != -1) {
+                break;
+            }
+            if (i == 0) {
+                printf("Waiting for USB device...\n");
+            }
+            sleep(1);
+        }
+    }
+
+    return usb_fd;
+}
+
 int main(int argc, const char *argv[])
 {
     int64_t target_time;
@@ -134,35 +200,7 @@ int main(int argc, const char *argv[])
         device_name = argv[1];
     }
 
-    if (device_name) {
-        usb_fd = open_device(device_name);
-        if (usb_fd < 0) {
-            perror("Unable to open hidraw device");
-            return 1;
-        }
-    }
-    else {
-        // Try to find the right device
-        struct dirent **namelist = NULL;
-        int count = scandir("/dev", &namelist, hid_name_filter, versionsort);
-        if (count < 0) {
-            perror("Scandir failed");
-            return 1;
-        }
-
-        for (int i = 0; i < count; i++) {
-            char full_name[PATH_MAX];
-            snprintf(full_name, PATH_MAX, "/dev/%s", namelist[i]->d_name);
-            int fd = open_device(full_name);
-            free(namelist[i]);
-            if (fd >= 0) {
-                usb_fd = fd;
-                break;
-            }
-        }
-        free(namelist);
-    }
-
+    usb_fd = find_and_open_device(device_name);
     if (usb_fd < 0) {
         return 1;
     }
